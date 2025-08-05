@@ -1,0 +1,28 @@
+import { assets } from './assets';
+import './Navbar.css';
+import React, { useEffect, useState } from 'react'
+
+const Navbar = () => {
+    const [menu,setMenu] = useState("home");
+  return (
+    <div className='navbar'>
+        <img src={assets.logo} alt="" className="logo" />
+        <ul className="navbar-menu">
+            <li onClick={()=>setMenu("home")} className={menu === "home" ? "active" : ""}>HOME</li>
+            <li onClick={()=>setMenu("menu")} className={menu === "menu" ? "active" : ""}>MENU</li>
+            <li onClick={()=>setMenu("mobile-app")} className={menu === "mobile-app" ? "active" : ""}>MOBILE-APP</li>
+            <li onClick={()=>setMenu("contact-us")} className={menu === "contact-us" ? "active" : ""}>CONTACT-US</li>
+        </ul>
+        <div className="navbar-right">
+            <img src={assets.search_icon} alt="" />
+            <div className="navbar-search-icon">
+                <img src={assets.basket_icon} alt="" />
+                <div className="dot"></div>
+            </div>
+            <button>SIGN IN</button>
+        </div>
+    </div>
+  )
+}
+
+export default Navbar
