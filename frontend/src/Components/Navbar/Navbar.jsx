@@ -1,4 +1,4 @@
-import { assets } from './assets';
+import { assets } from '../../assets/assets';
 import './Navbar.css';
 import React, { useEffect, useState } from 'react'
 
