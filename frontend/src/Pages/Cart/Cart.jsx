@@ -1,20 +1,23 @@
-import { useContext } from "react";
-import "./Cart.css";
-import { StoreContext } from "../../context/StoreContext";
-import { useNavigate } from "react-router-dom";
+import React, { useContext } from 'react'
+import './Cart.css'
+import { StoreContext } from '../../context/StoreContext'
+import { useNavigate } from 'react-router-dom'
 const Cart = () => {
-  const { cartItems, food_list, removeFromCart, getTotalCartAmount,url} = useContext(StoreContext);
+
+  const { cartItems, food_list, removeFromCart,getTotalCartAmount,url} = useContext(StoreContext);
+
   const navigate = useNavigate();
+
   return (
-    <div className="cart">
+    <div className='cart'>
       <div className="cart-items">
         <div className="cart-items-title">
-          <p>ITEMS</p>
-          <p>TITLE</p>
-          <p>PRICE</p>
-          <p>QUANTITY</p>
-          <p>TOTAL</p>
-          <p>REMOVE</p>
+          <p>Items</p>
+          <p>Title</p>
+          <p>Price</p>
+          <p>Quantity</p>
+          <p>Total</p>
+          <p>Remove</p>
         </div>
         <br />
         <hr />
@@ -28,50 +31,47 @@ const Cart = () => {
                   <p>${item.price}</p>
                   <p>{cartItems[item._id]}</p>
                   <p>${item.price * cartItems[item._id]}</p>
-                  <p onClick={() => removeFromCart(item._id)} className="cross">
-                    x
-                  </p>
+                  <p onClick={()=>removeFromCart(item._id)} className='cross'>x</p>
                 </div>
                 <hr />
               </div>
-            );
+            )
           }
         })}
       </div>
       <div className="cart-bottom">
         <div className="cart-total">
-          <h2>CART TOTAL</h2>
+          <h2>Cart Total</h2>
           <div>
             <div className="cart-total-details">
-              <p>SUBTOTAL</p>
+              <p>Subtotal</p>
               <p>${getTotalCartAmount()}</p>
             </div>
             <hr />
             <div className="cart-total-details">
-              <p>DELIVERY FEE</p>
-              <p>${getTotalCartAmount() === 0  ? 0 : 2}</p>
+              <p>Delivery Fee</p>
+              <p>${getTotalCartAmount()===0?0:2}</p>
             </div>
             <hr />
             <div className="cart-total-details">
-              <b>TOTAL</b>
-              <b>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount()+2}</b>
+              <b>Total</b>
+              <b>${getTotalCartAmount()===0?0:getTotalCartAmount()+2}</b>
             </div>
           </div>
-          {getTotalCartAmount() === 0 ? <button className="button-notactive">PROCEED TO CHECK OUT</button> : <button className = "button-active" onClick={() => navigate('/order')}>PROCEED TO CHECK OUT</button>}
-          
+          <button onClick={()=>navigate('/order')} >PROCEED TO CHECKOUT</button>
         </div>
-        <div className="cart-promocode">
+        <div className="cart-promo-code">
           <div>
             <p>If you have a promo code, Enter it here</p>
-            <div className="cart-promocode-input">
-              <input type="text"  placeholder="promo code"/>
-              <button>SUBMIT</button>
+            <div className='cart-promocode-input'>
+              <input type="text" placeholder='promo code' />
+              <button>Submit</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Cart;
+export default Cart
