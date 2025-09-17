@@ -1,0 +1,3 @@
+frontend - https://food-delivery-frontend-kbjw.onrender.com
+admin - https://food-delivery-admin-hg51.onrender.com
+backend - https://food-delivery-backend-6d7a.onrender.com
