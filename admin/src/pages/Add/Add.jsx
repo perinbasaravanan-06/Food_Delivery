@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import "./Add.css";
-import { assets } from "../../assets/assets";
+import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import "./Add.css";
+import { assets } from "../../assets/assets";
 
-const Add = ({ url }) => {
-  const [image, SetImage] = useState(null); // ✅ Initialize as null
+const Add = ({ url}) => {
+  const [image, setImage] = useState(null);
   const [data, setData] = useState({
     name: "",
     description: "",
@@ -14,14 +14,14 @@ const Add = ({ url }) => {
   });
 
   // Handle input changes
-  const onChangeHandler = (event) => {
-    const { name, value } = event.target;
+  const onChangeHandler = (e) => {
+    const { name, value } = e.target;
     setData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle form submission
-  const onSubmitHandler = async (event) => {
-    event.preventDefault();
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
 
     if (!image) {
       toast.error("Please select an image");
@@ -33,29 +33,26 @@ const Add = ({ url }) => {
     formData.append("description", data.description);
     formData.append("price", Number(data.price));
     formData.append("category", data.category);
-    formData.append("image", image); // ✅ File object
+    formData.append("image", image); // must match upload.single("image")
 
     try {
-      // Remove manual Content-Type header, Axios handles it automatically
       const response = await axios.post(`${url}/api/food/add`, formData);
 
-      if (response.status === 201) {
-        setData({ name: "", description: "", price: "", category: "Salad" });
-        SetImage(null);
+      if (response.data.success) {
         toast.success("Food added successfully!");
+        setData({ name: "", description: "", price: "", category: "Salad" });
+        setImage(null);
+
+        // optional: notify parent to refresh food list
+        if (onFoodAdded) onFoodAdded();
+      } else {
+        toast.error(response.data.message || "Something went wrong");
       }
     } catch (err) {
       console.error("Frontend error:", err.response?.data || err);
       toast.error(err.response?.data?.message || "Something went wrong");
     }
   };
-
-  // Clean up object URL to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (image) URL.revokeObjectURL(image);
-    };
-  }, [image]);
 
   return (
     <div className="add">
@@ -69,11 +66,11 @@ const Add = ({ url }) => {
             />
           </label>
           <input
-            onChange={(e) => SetImage(e.target.files[0])}
+            onChange={(e) => setImage(e.target.files[0])}
             type="file"
             id="image"
-            hidden
             accept="image/*"
+            hidden
             required
           />
         </div>
@@ -81,11 +78,11 @@ const Add = ({ url }) => {
         <div className="add-product-name flex-col">
           <p>Product Name</p>
           <input
-            onChange={onChangeHandler}
-            value={data.name}
             type="text"
             name="name"
+            value={data.name}
             placeholder="Enter product name"
+            onChange={onChangeHandler}
             required
           />
         </div>
@@ -93,22 +90,22 @@ const Add = ({ url }) => {
         <div className="add-product-description flex-col">
           <p>Product Description</p>
           <textarea
-            onChange={onChangeHandler}
-            value={data.description}
             name="description"
-            rows="6"
-            placeholder="Write description here"
+            value={data.description}
+            placeholder="Enter description"
+            rows="5"
+            onChange={onChangeHandler}
             required
-          ></textarea>
+          />
         </div>
 
         <div className="add-category-price">
           <div className="add-category flex-col">
-            <p>Product Category</p>
+            <p>Category</p>
             <select
-              onChange={onChangeHandler}
               name="category"
               value={data.category}
+              onChange={onChangeHandler}
             >
               <option value="Salad">Salad</option>
               <option value="Rolls">Rolls</option>
@@ -122,13 +119,13 @@ const Add = ({ url }) => {
           </div>
 
           <div className="add-price flex-col">
-            <p>Product Price</p>
+            <p>Price</p>
             <input
-              onChange={onChangeHandler}
-              value={data.price}
               type="number"
               name="price"
+              value={data.price}
               placeholder="$20"
+              onChange={onChangeHandler}
               required
             />
           </div>
