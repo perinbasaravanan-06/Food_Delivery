@@ -5,7 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const Add = ({ url }) => {
-  const [image, SetImage] = useState(null);
+  const [image, SetImage] = useState(null); // ✅ Initialize as null
   const [data, setData] = useState({
     name: "",
     description: "",
@@ -33,14 +33,11 @@ const Add = ({ url }) => {
     formData.append("description", data.description);
     formData.append("price", Number(data.price));
     formData.append("category", data.category);
-    formData.append("image", image);
+    formData.append("image", image); // ✅ File object
 
     try {
-      const response = await axios.post(`${url}/api/food/add`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      // Remove manual Content-Type header, Axios handles it automatically
+      const response = await axios.post(`${url}/api/food/add`, formData);
 
       if (response.status === 201) {
         setData({ name: "", description: "", price: "", category: "Salad" });
@@ -48,6 +45,7 @@ const Add = ({ url }) => {
         toast.success("Food added successfully!");
       }
     } catch (err) {
+      console.error("Frontend error:", err.response?.data || err);
       toast.error(err.response?.data?.message || "Something went wrong");
     }
   };
