@@ -49,8 +49,11 @@ export const removeFood = async (req, res) => {
     const food = await Food.findById(req.body.id);
     if (!food) return res.status(404).json({ success: false, message: "Food not found" });
 
+    console.log("Deleting food:", food.name, "with public_id:", food.public_id);
+
     if (food.public_id) {
-      await cloudinary.uploader.destroy(food.public_id);
+      const result = await cloudinary.uploader.destroy(food.public_id);
+      console.log("Cloudinary deletion result:", result);
     }
 
     await Food.findByIdAndDelete(req.body.id);
@@ -60,3 +63,4 @@ export const removeFood = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
