@@ -27,17 +27,23 @@ const addFood = async (req,res)=>{
 }
 
 //all food list
-const listFood = async (req,res)=>{
- try{
-     const foods = await foodModel.find({});
-     res.json({success:true,data:foods})
- }
- catch(error){
-        console.log(error);
-        res.json({success:false,message:"Error"})
- }
- 
-}
+const listFood = async (req, res) => {
+  try {
+    const foods = await foodModel.find({});
+
+    // Add backend URL to each image
+    const updatedFoods = foods.map(food => ({
+      ...food._doc,
+     image: `${process.env.BACKEND_URL}/images/${food.image}`,
+    }));
+
+    res.json({ success: true, data: updatedFoods });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Error" });
+  }
+};
+
 
 //remove food item
 
