@@ -4,24 +4,31 @@ import { cloudinary } from "../config/cloudinaryConfig.js";
 // Add new food
 export const addFood = async (req, res) => {
   try {
+    console.log("🟢 Received add request");
+    console.log("Body:", req.body);
+    console.log("File:", req.file);
+
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "No image uploaded" });
+      console.log("❌ No image uploaded");
+      return res.status(400).json({ message: "No image uploaded" });
     }
 
     const food = new Food({
       name: req.body.name,
-      description: req.body.description,
       price: req.body.price,
+      description: req.body.description,
       category: req.body.category,
       image: req.file.path,
       public_id: req.file.filename,
     });
 
     await food.save();
-    res.status(201).json({ success: true, message: "Food added successfully", data: food });
-  } catch (error) {
-    console.error("Backend addFood error:", error);
-    res.status(500).json({ success: false, message: error.message });
+    console.log("✅ Food saved:", food);
+
+    res.status(201).json({ success: true, food });
+  } catch (err) {
+    console.error("❌ Backend error:", err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
