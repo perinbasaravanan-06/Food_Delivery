@@ -7,7 +7,7 @@ const router = express.Router();
 const upload = multer({ storage });
 
 router.post("/add", upload.single("image"), addFood);
-router.get("/", listFood);
+router.get("/list", listFood);
 router.delete("/remove", removeFood);
 
 export default router;
