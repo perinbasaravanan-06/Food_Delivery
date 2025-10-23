@@ -44,7 +44,7 @@ const Add = ({ url}) => {
         setImage(null);
 
         // optional: notify parent to refresh food list
-        if (onFoodAdded) onFoodAdded();
+        
       } else {
         toast.error(response.data.message || "Something went wrong");
       }
