@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Add.css";
 import { assets } from "../../assets/assets";
 import axios from "axios";
 import { toast } from "react-toastify";
-const Add = ({url}) => {
-  
-  const [image, SetImage] = useState(false);
+
+const Add = ({ url }) => {
+  const [image, SetImage] = useState(null);
   const [data, setData] = useState({
     name: "",
     description: "",
@@ -13,36 +13,51 @@ const Add = ({url}) => {
     category: "Salad",
   });
 
+  // Handle input changes
   const onChangeHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setData((data) => ({ ...data, [name]: value }));
+    const { name, value } = event.target;
+    setData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle form submission
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+
+    if (!image) {
+      toast.error("Please select an image");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("description", data.description);
     formData.append("price", Number(data.price));
     formData.append("category", data.category);
     formData.append("image", image);
-    const response = await axios.post(`${url}/api/food/add`, formData);
-    if (response.data.success) {
-      setData({
-        name: "",
-        description: "",
-        price: "",
-        category: "Salad",
+
+    try {
+      const response = await axios.post(`${url}/api/food/add`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-      SetImage(false)
-      toast.success(response.data.message)
-      
-    } else {
-      toast.error(response.data.message)
-       
+
+      if (response.status === 201) {
+        setData({ name: "", description: "", price: "", category: "Salad" });
+        SetImage(null);
+        toast.success("Food added successfully!");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Something went wrong");
     }
   };
+
+  // Clean up object URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (image) URL.revokeObjectURL(image);
+    };
+  }, [image]);
 
   return (
     <div className="add">
@@ -52,7 +67,7 @@ const Add = ({url}) => {
           <label htmlFor="image">
             <img
               src={image ? URL.createObjectURL(image) : assets.upload_area}
-              alt=""
+              alt="Upload Preview"
             />
           </label>
           <input
@@ -60,9 +75,11 @@ const Add = ({url}) => {
             type="file"
             id="image"
             hidden
+            accept="image/*"
             required
           />
         </div>
+
         <div className="add-product-name flex-col">
           <p>Product Name</p>
           <input
@@ -70,10 +87,11 @@ const Add = ({url}) => {
             value={data.name}
             type="text"
             name="name"
-            placeholder="Type her"
+            placeholder="Enter product name"
             required
           />
         </div>
+
         <div className="add-product-description flex-col">
           <p>Product Description</p>
           <textarea
@@ -81,14 +99,19 @@ const Add = ({url}) => {
             value={data.description}
             name="description"
             rows="6"
-            placeholder="Write Content Here"
+            placeholder="Write description here"
             required
           ></textarea>
         </div>
+
         <div className="add-category-price">
           <div className="add-category flex-col">
-            <p>Product category</p>
-            <select onChange={onChangeHandler} name="category">
+            <p>Product Category</p>
+            <select
+              onChange={onChangeHandler}
+              name="category"
+              value={data.category}
+            >
               <option value="Salad">Salad</option>
               <option value="Rolls">Rolls</option>
               <option value="Desert">Desert</option>
@@ -99,8 +122,9 @@ const Add = ({url}) => {
               <option value="Noodles">Noodles</option>
             </select>
           </div>
+
           <div className="add-price flex-col">
-            <p>Prodcut Price</p>
+            <p>Product Price</p>
             <input
               onChange={onChangeHandler}
               value={data.price}
@@ -111,6 +135,7 @@ const Add = ({url}) => {
             />
           </div>
         </div>
+
         <button type="submit" className="add-button">
           ADD
         </button>
