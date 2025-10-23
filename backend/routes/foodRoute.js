@@ -8,6 +8,6 @@ const upload = multer({ storage });
 
 router.post("/add", upload.single("image"), addFood);
 router.get("/list", listFood);
-router.delete("/remove", removeFood);
+router.post("/remove", removeFood);
 
 export default router;
