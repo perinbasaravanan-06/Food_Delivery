@@ -1,28 +1,41 @@
-import express from "express"
+// routes/foodRoute.js
+import express from "express";
+import multer from "multer";
+import { storage } from "../config/cloudinaryConfig.js";
+import Food from "../models/foodModel.js";
 
-import { addFood, listFood ,removeFood} from "../controllers/foodController.js"
+const router = express.Router();
+const upload = multer({ storage });
 
-import multer from "multer"
-
-const foodRouter = express.Router();
-
-//Image storage Engine
-
-const storage = multer.diskStorage({
-    destination : "uploads",
-    filename:(req,file,cb)=>{
-        return cb(null,`${Date.now()}${file.originalname}`)
+// Add a new food item
+router.post("/add", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Image is required" });
     }
-})
 
-const upload = multer({storage:storage})
+    const food = new Food({
+      name: req.body.name,
+      price: req.body.price,
+      image: req.file.path, // Cloudinary URL
+    });
 
-foodRouter.post("/add",upload.single("image"),addFood)
+    await food.save();
+    res.status(201).json(food);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+});
 
-foodRouter.get("/list",listFood)
+// Get all food items
+router.get("/", async (req, res) => {
+  try {
+    const foods = await Food.find({});
+    res.status(200).json(foods);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
-foodRouter.post("/remove",removeFood)
-
-
-export default foodRouter;
-
+export default router;
