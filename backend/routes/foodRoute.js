@@ -11,22 +11,26 @@ const upload = multer({ storage });
 router.post("/add", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: "Image is required" });
+      return res.status(400).json({ message: "No image uploaded" });
     }
 
     const food = new Food({
       name: req.body.name,
       price: req.body.price,
-      image: req.file.path, // Cloudinary URL
+      description: req.body.description,
+      category: req.body.category,
+      image: req.file.path,
+      public_id: req.file.filename,
     });
 
     await food.save();
-    res.status(201).json(food);
+    res.status(201).json({ success: true, food });
   } catch (err) {
-    console.error(err);
+    console.error("Backend error:", err); // <--- very important
     res.status(500).json({ message: err.message });
   }
 });
+
 
 // Get all food items
 router.get("/", async (req, res) => {
